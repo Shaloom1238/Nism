@@ -9,7 +9,7 @@ on:
 
 jobs:
   build:
-    runs-on: macos-latest
+    runs-on: macos-26
 
     steps:
       - name: Checkout repository
@@ -18,16 +18,17 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
 
-      - name: Install project dependencies
+      - name: Install dependencies
         run: npm install --legacy-peer-deps
 
       - name: Fix TypeScript compatibility
         run: npm install --save-dev typescript@5.9.3 --legacy-peer-deps
 
-      - name: Install Capacitor
-        run: npm install @capacitor/core @capacitor/cli @capacitor/ios --legacy-peer-deps
+      - name: Install Capacitor 8
+        run: |
+          npm install @capacitor/core@8 @capacitor/cli@8 @capacitor/ios@8 --legacy-peer-deps
 
       - name: Build web application
         run: npm run build
