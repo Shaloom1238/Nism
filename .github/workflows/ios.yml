@@ -22,14 +22,21 @@ jobs:
       - name: Install project dependencies
         run: npm install --legacy-peer-deps
 
-      - name: Install Capacitor
-        run: npm install @capacitor/core @capacitor/cli @capacitor/ios --legacy-peer-deps
-
       - name: Build web application
         run: npm run build
 
-      - name: Initialize Capacitor
-        run: npx cap init "NISM Exam Prep" com.shalom.nism --web-dir dist
+      - name: Install Capacitor 7
+        run: npm install @capacitor/core@7 @capacitor/cli@7 @capacitor/ios@7 --legacy-peer-deps
+
+      - name: Create Capacitor configuration
+        run: |
+          cat > capacitor.config.json << 'EOF'
+          {
+            "appId": "com.shalom.nism",
+            "appName": "NISM Exam Prep",
+            "webDir": "dist"
+          }
+          EOF
 
       - name: Add iOS platform
         run: npx cap add ios
@@ -50,7 +57,7 @@ jobs:
 
       - name: Package IPA
         run: |
-          mkdir Payload
+          mkdir -p Payload
           cp -R build/Build/Products/Release-iphoneos/App.app Payload/
           zip -r NISM-Exam-Prep.ipa Payload
 
