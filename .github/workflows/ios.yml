@@ -1,3 +1,4 @@
+
 name: Build iOS IPA
 
 on:
@@ -19,24 +20,17 @@ jobs:
         with:
           node-version: 20
 
-      - name: Install project dependencies
+      - name: Install dependencies
         run: npm install --legacy-peer-deps
+
+      - name: Install Capacitor
+        run: npm install @capacitor/core @capacitor/cli @capacitor/ios --legacy-peer-deps
 
       - name: Build web application
         run: npm run build
 
-      - name: Install Capacitor 7
-        run: npm install @capacitor/core@7 @capacitor/cli@7 @capacitor/ios@7 --legacy-peer-deps
-
-      - name: Create Capacitor configuration
-        run: |
-          cat > capacitor.config.json << 'EOF'
-          {
-            "appId": "com.shalom.nism",
-            "appName": "NISM Exam Prep",
-            "webDir": "dist"
-          }
-          EOF
+      - name: Initialize Capacitor
+        run: npx cap init "NISM Exam Prep" com.shalom.nism --web-dir dist
 
       - name: Add iOS platform
         run: npx cap add ios
@@ -44,12 +38,19 @@ jobs:
       - name: Sync iOS application
         run: npx cap sync ios
 
+      - name: Resolve iOS dependencies
+        run: |
+          xcodebuild -resolvePackageDependencies \
+            -project ios/App/App.xcodeproj \
+            -scheme App
+
       - name: Build iOS application
         run: |
           xcodebuild \
             -project ios/App/App.xcodeproj \
             -scheme App \
             -sdk iphoneos \
+            -destination 'generic/platform=iOS' \
             -configuration Release \
             -derivedDataPath build \
             CODE_SIGNING_ALLOWED=NO \
